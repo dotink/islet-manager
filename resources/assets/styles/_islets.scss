@@ -1,0 +1,278 @@
+#actions {
+	display: block;
+
+	transform: translateY(-50%);
+  top: 50%;
+
+	list-style-type: none;
+	position: fixed;
+	margin-left: 1rem;
+	padding: 0;
+
+	li {
+		&::before {
+			display: block;
+			margin: 0 0 2rem 0;
+			padding: 0;
+			width: 5rem;
+			height: 5rem;
+			font-family: "Font Awesome 5 Free";
+			font-weight: 900;
+			color: #fff;
+			font-size: 2.5rem;
+			text-align: center;
+			border-radius: 2.5rem;
+			line-height: 5rem;
+			cursor: pointer;
+			background-color: rgb(247, 47, 125);
+			box-shadow: 0 0 5px 1px rgba(0,0,0,.25);
+			content: ' ';
+		}
+
+		&[data-name="start-managing"]::before {
+			content: "\f0e8";
+
+			body.editing > &,
+			body.managing > & {
+				display: none;
+			}
+		}
+
+		&[data-name="start-editing"]::before {
+			content: "\f303";
+
+			body.editing > &,
+			body.managing > & {
+				display: none;
+			}
+		}
+
+		&[data-name="save-editing"]::before {
+			display: none;
+			background-color: rgb(26, 184, 0);
+			content: "\f00c";
+
+			body.editing > &,
+			body.managing > & {
+				display: block;
+			}
+		}
+
+		&[data-name="exit-mode"]::before {
+			display: none;
+			content: "\f053";
+			background-color: rgb(61, 133, 255);
+
+			body.editing > &,
+			body.managing > & {
+				display: block;
+			}
+		}
+	}
+}
+
+$im-width: 320px;
+$im-bg-color: rgb(125, 137, 163);
+$im-button-size: 40px;
+$im-padding: 15px;
+
+body {
+	transition: padding-right 250ms;
+
+	.islet.manager {
+		display: flex;
+		position: fixed;
+		flex-direction: column;
+		justify-content: space-around;
+		z-index: 1000;
+		right: -$im-width;
+		top: 0;
+
+		width: $im-width;
+		height: 100%;
+		background-color: $im-bg-color;
+		border-left: solid 1px #ddd;
+		font-family: sans-serif;
+
+		transition: right 250ms;
+
+		.toolbar {
+			display: flex;
+			flex-direction: row;
+			flex: 0 0;
+			justify-content: space-between;
+			padding: $im-padding;
+
+			button {
+				width: $im-button-size;
+				height: $im-button-size;
+				padding: 0;
+				overflow: hidden;
+				border: none;
+				border-radius: $im-button-size / 2;
+				text-align: center;
+				line-height: $im-button-size;
+				background-color: lighten($im-bg-color, 50);
+				cursor: pointer;
+
+				&::before {
+					display: block;
+					font-family: "Font Awesome 5 Free";
+					font-weight: 900;
+					color: rgb(247, 47, 125);
+					transition: color 250ms;
+				}
+
+				&.parent::before {
+					content: "\f3bf";
+				}
+
+				&.add::before {
+					content: "\f067";
+				}
+
+				&.remove::before {
+					content: "\f2ed";
+				}
+
+				&.disabled::before {
+					color: #ddd;
+				}
+			}
+		}
+	}
+
+	&.managing {
+		padding-right: 320px;
+
+		.islet.manager {
+			right: 0;
+		}
+	}
+}
+
+
+.islet.manager .tools {
+	flex: 1 0;
+	background-color: lighten($im-bg-color, 50);
+
+	.message {
+		padding: $im-padding;
+		font-size: 18px;
+		line-height: 28px;
+
+		p {
+			text-align: center;
+			font-style: italic;
+			color: #888;
+		}
+	}
+}
+
+.islet.manager .tools > div {
+	position: absolute;
+	width: 100%;
+	height: calc(100% - #{$im-padding} - #{$im-button-size});
+	left: 100%;
+	transition: left 250ms;
+	background-color: inherit;
+	overflow-y: auto;
+}
+
+.islet.manager .tools > div.active {
+	left: 0;
+}
+
+
+.islet.manager .list ol,
+.islet.manager .add ol {
+list-style: none;
+margin: 0;
+padding: 0;
+}
+
+.islet.manager .list li,
+.islet.manager .add li {
+	clear: both;
+	position: relative;
+	border-top: solid 1px #eee;
+	padding: $im-padding;
+	margin: 0;
+	transition: background-color 500ms;
+
+	&.selected {
+		background-color: rgb(211, 237, 211);
+		transition: none;
+	}
+}
+
+.islet.manager .list li::before,
+.islet.manager .add li::before {
+		display: none;
+}
+
+.islet.manager .list li h1,
+.islet.manager .add li h1 {
+		font-family: sans-serif;
+		font-weight: normal;
+		font-size: 16px;
+		color: #666;
+		margin: 4px 0;
+}
+
+.islet.manager .list li .preview,
+.islet.manager .add li .preview {
+	font-family: sans-serif;
+	overflow: hidden;
+	line-height: 1em;
+}
+
+
+.islet.manager .list li .preview .thumb,
+.islet.manager .add li .preview .thumb {
+float: left;
+margin-right: 1rem;
+		width: 128px;
+}
+
+.islet.manager .list li .preview .content,
+.islet.manager .add li .preview .description {
+font-size: 11px;
+}
+
+.islet.manager .list li .handle{
+	position: absolute;
+	top: 0;
+	right: 0;
+	opacity: .15;
+	cursor: grab;
+	font-size: $im-padding * 1.5;
+	line-height: $im-padding * 1.5;
+}
+
+.islet.manager .help li {
+	cursor: pointer;
+}
+
+body.managing {
+	.is-selected,
+	.is-highlighted,
+	.is-focused:not(.is-has-selected) {
+		background-color: rgba(200, 224, 200, .25) !important;
+	}
+}
+
+body.editing [data-islet] {
+	> * {
+		background-color: rgba(255, 247, 215, .40);
+	}
+}
+
+body.managing,
+body.editing {
+	div:empty, section:empty {
+		&::before {
+			content: '...' !important;
+		}
+	}
+}

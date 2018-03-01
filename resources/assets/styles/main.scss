@@ -1,0 +1,12 @@
+@import url('https://use.fontawesome.com/releases/v5.0.7/css/all.css');
+@import 'islets';
+
+html {
+  font-size: 10px;
+}
+
+body > * {
+  font-size: 1.6em;
+  max-width: 1280px;
+  margin: 0 auto;
+}

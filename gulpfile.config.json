@@ -1,0 +1,49 @@
+{
+    "app": {
+        "root":   "public",
+        "source": "resources/assets",
+        "target": "public/assets",
+        "index":  "assets/components/index.html",
+
+        "assets": [
+            {
+                "source": "scripts",
+                "target": "scripts",
+                "filter": ["js"],
+                "entries": {
+                    "admin": "./admin.js"
+                },
+                "resolve": {
+                    "alias": {
+                        "vue$": "vue/dist/vue.esm.js"
+                    }
+                }
+            },
+            {
+                "source": "lib",
+                "target": "lib",
+                "filter": ["none"]
+            },
+            {
+                "source": "styles",
+                "target": "styles",
+                "filter": ["css", "sass"]
+            },
+            {
+                "source": "images",
+                "target": "images",
+                "filter": ["images"]
+            },
+            {
+                "source": "fonts",
+                "target": "fonts",
+                "filter": ["none"]
+            },
+            {
+                "source": "components",
+                "target": "components",
+                "filter": ["html"]
+            }
+        ]
+    }
+}
