@@ -1,4 +1,4 @@
-var fs      = require('fs-extra'),
+var fs        = require('fs-extra'),
 	del       = require('del'),
 	args      = require('yargs'),
 	gulp      = require('gulp'),

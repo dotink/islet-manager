@@ -6,6 +6,7 @@ export default Vue.extend({
             actions: []
         };
     },
+    
     methods: {
         add: function (name, tooltip, click, data) {
             this.actions.push({
@@ -15,11 +16,13 @@ export default Vue.extend({
                 data: data
             });
         },
+
         remove: function(name) {
             this.actions = this.actions.filter(function(item) {
                 return item.name != name;
             });
         },
+
         click: function(event) {
             var name = event.target.getAttribute('data-name');
 
