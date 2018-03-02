@@ -276,6 +276,7 @@ export default Vue.extend({
 
 		focusedContainer: function(newValue, oldValue) {
 			this.components = [];
+			this.selected   = 0;
 
 			if (oldValue) {
 				oldValue.classList.remove('is-has-selected');
@@ -293,8 +294,6 @@ export default Vue.extend({
 				newValue.classList.remove('is-highlighted');
 				newValue.classList.add('is-focused');
 			}
-
-			this.selected = 0;
 		}
 	},
 
