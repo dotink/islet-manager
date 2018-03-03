@@ -1,8 +1,11 @@
 import Vue from 'vue';
 
-export default Vue.extend({
+export default Vue.component('is-component', {
+    template: '<div></div>',
+    
     data: function() {
         return {
+            node: null,
             manager: null,
             selected: false,
             module: {
@@ -10,7 +13,7 @@ export default Vue.extend({
                 description: null,
                 thumb: null
             }
-        }
+        };
     },
 
 
@@ -22,7 +25,7 @@ export default Vue.extend({
 
             this.selected = false;
 
-            this.$el.classList.remove('is-selected');
+            this.node.classList.remove('is-selected');
             this.manager.selected--;
         },
 
@@ -33,7 +36,7 @@ export default Vue.extend({
 
             this.selected  = true;
 
-            this.$el.classList.add('is-selected');
+            this.node.classList.add('is-selected');
             this.manager.selected++;
         },
 
@@ -53,7 +56,7 @@ export default Vue.extend({
                 return this.module.label;
             }
 
-            switch(this.$el.nodeName) {
+            switch(this.node.nodeName) {
                 case 'P': return 'Paragraph';
                 case 'H1': return 'Heading';
                 case 'UL': return 'Unordered List';
@@ -66,7 +69,7 @@ export default Vue.extend({
         },
 
         summary: function() {
-            return this.$el.innerText.slice(0, 60) + '...';
+            return this.node.innerText.slice(0, 60) + '...';
         },
 
         thumb: function() {

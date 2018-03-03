@@ -2,7 +2,7 @@ import Vue from 'vue';
 import IsletComponent from './component';
 import IsletModule from './module';
 
-export default Vue.extend({
+export default Vue.component('is-manager', {
     data: function() {
         return {
             on: false,
@@ -45,8 +45,8 @@ export default Vue.extend({
 
             for (var i = 0; i < template.content.children.length; i++) {
                 this.components.push(new IsletComponent({
-                    el: this.container.appendChild(template.content.children.item(i)),
                     data: {
+                        node: this.container.appendChild(template.content.children.item(i)),
                         manager: this
                     }
                 }));
@@ -141,15 +141,22 @@ export default Vue.extend({
 
         move: function(event) {
             if (event.oldIndex != event.newIndex) {
-                var nodes   = this.container.children;
-                var subject = this.container.removeChild(nodes[event.oldIndex]);
+                var nodes     = this.container.children;
+                var subject   = this.container.removeChild(nodes[event.oldIndex]);
+                var component = this.components.splice(event.oldIndex, 1)[0];
+
+                if (event.newIndex < event.oldIndex) {
+                    event.from.insertBefore(event.item, event.from.children.item(event.oldIndex).nextSibling);
+                } else {
+                    event.from.insertBefore(event.item, event.from.children.item(event.oldIndex));
+                }
 
                 if (event.newIndex == nodes.length) {
+                    this.components.push(component);
                     this.container.appendChild(subject, null);
-
                 } else {
+                    this.components.splice(event.newIndex, 0, component);
                     this.container.insertBefore(subject, nodes[event.newIndex]);
-
                 }
             }
         },
@@ -166,7 +173,7 @@ export default Vue.extend({
             for (var i = 0; i < this.components.length; i++) {
                 if (this.components[i].selected) {
                     this.components[i].deselect();
-                    this.components[i].$el.parentNode.removeChild(this.components[i].$el);
+                    this.components[i].node.parentNode.removeChild(this.components[i].node);
 
                 } else {
                     safe.push(this.components[i]);
@@ -274,28 +281,34 @@ export default Vue.extend({
 
     watch: {
         selected: function(newValue, oldValue) {
-            if (newValue > 0) {
-                this.container.classList.add('is-has-selected');
+            if (this.container) {
+                if (newValue > 0) {
+                    this.container.classList.add('is-has-selected');
 
-            } else {
-                this.container.classList.remove('is-has-selected');
+                } else {
+                    this.container.classList.remove('is-has-selected');
+                }
             }
         },
 
         container: function(newValue, oldValue) {
-            this.components = [];
-            this.selected   = 0;
-
             if (oldValue) {
-                oldValue.classList.remove('is-has-selected');
+                this.components.forEach(function(component) {
+                    component.deselect();
+                });
+
                 oldValue.classList.remove('is-focused');
             }
+
+            this.components = [];
 
             if (newValue) {
                 for (var i = 0; i < newValue.children.length; i++) {
                     this.components.push(new IsletComponent({
-                        el: newValue.children.item(i),
-                        data: { manager: this }
+                        data: {
+                            node: newValue.children.item(i),
+                            manager: this
+                        }
                     }));
                 }
 
@@ -329,5 +342,11 @@ export default Vue.extend({
             handle: '.handle',
             onEnd: this.move
         });
+
+        /*
+
+
+
+        */
     }
 });
