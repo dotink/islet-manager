@@ -1,8 +1,8 @@
 import IsletManager from './islets/manager';
 import Dock from './dock';
 
-var islet_manager = new IsletManager({el: document.querySelector('.islet.manager')});
-var dock          = new Dock({el: document.querySelector('#actions')});
+var islet_manager = new IsletManager({el: document.querySelector('#manager')});
+var dock          = new Dock({el: document.querySelector('#dock')});
 var islets        = document.querySelectorAll('[data-islet]');
 
 

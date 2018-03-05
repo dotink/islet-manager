@@ -1,12 +1,14 @@
 import Vue from 'vue';
+import template from './views/dock.html';
 
-export default Vue.extend({
+export default Vue.component('dock', {
+    template: template,
     data: function() {
         return {
             actions: []
         };
     },
-    
+
     methods: {
         add: function (name, tooltip, click, data) {
             this.actions.push({

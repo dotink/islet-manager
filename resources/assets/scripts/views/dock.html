@@ -1,0 +1,7 @@
+<ul id="actions">
+    <li v-for="item in actions"
+        v-on:click="click"
+        :data-name="item.name"
+        :title="item.tooltip">
+    </li>
+</ul>

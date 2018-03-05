@@ -1,8 +1,14 @@
 import Vue from 'vue';
 import IsletComponent from './component';
 import IsletModule from './module';
+import template from './views/manager.html';
+
+var Sortable = require('sortablejs/Sortable.js');
 
 export default Vue.component('is-manager', {
+    template: template,
+    components: {IsletComponent},
+
     data: function() {
         return {
             on: false,
@@ -12,7 +18,6 @@ export default Vue.component('is-manager', {
             handle: null,
             islets: [],
             sorting: false,
-            selected: 0,
             container: null,
             components: [],
             modules: {
@@ -33,6 +38,20 @@ export default Vue.component('is-manager', {
     },
 
 
+    computed: {
+        selected: function() {
+            var count = 0;
+
+            for (var i = 0; i < this.components.length; i++) {
+                if (this.components[i].selected) {
+                    count++;
+                }
+            }
+
+            return count;
+        }
+    },
+
     methods: {
 
         //
@@ -44,12 +63,11 @@ export default Vue.component('is-manager', {
             template.innerHTML = module.content.trim();
 
             for (var i = 0; i < template.content.children.length; i++) {
-                this.components.push(new IsletComponent({
-                    data: {
-                        node: this.container.appendChild(template.content.children.item(i)),
-                        manager: this
-                    }
-                }));
+                this.components.push({
+                    node: this.container.appendChild(template.content.children.item(i)),
+                    selected: false,
+                    manager: this
+                });
             }
 
             this.show('list');
@@ -145,11 +163,21 @@ export default Vue.component('is-manager', {
                 var subject   = this.container.removeChild(nodes[event.oldIndex]);
                 var component = this.components.splice(event.oldIndex, 1)[0];
 
+                //
+                // This next if/else is stupid, but it's necessary.  Basically, we undo the DOM
+                // move that Sortable just did, cause when we modify the components below Vue will
+                // re-render the component list.
+                //
+
                 if (event.newIndex < event.oldIndex) {
                     event.from.insertBefore(event.item, event.from.children.item(event.oldIndex).nextSibling);
                 } else {
                     event.from.insertBefore(event.item, event.from.children.item(event.oldIndex));
                 }
+
+                //
+                // Move our components and the associated DOM nodes.
+                //
 
                 if (event.newIndex == nodes.length) {
                     this.components.push(component);
@@ -158,6 +186,8 @@ export default Vue.component('is-manager', {
                     this.components.splice(event.newIndex, 0, component);
                     this.container.insertBefore(subject, nodes[event.newIndex]);
                 }
+
+                this.sorting = false;
             }
         },
 
@@ -172,7 +202,6 @@ export default Vue.component('is-manager', {
 
             for (var i = 0; i < this.components.length; i++) {
                 if (this.components[i].selected) {
-                    this.components[i].deselect();
                     this.components[i].node.parentNode.removeChild(this.components[i].node);
 
                 } else {
@@ -200,21 +229,20 @@ export default Vue.component('is-manager', {
         //
         //
 
-        select: function(component, event) {
-            if (event.ctrlKey || event.metaKey) {
-                component.toggleSelected();
+        select: function(key, event) {
+            if (!event.ctrlKey && !event.metaKey) {
+                for (var i = 0; i < this.components.length; i++) {
+                    this.components[i].selected = false;
+                }
 
-            } else if (component.selected) {
-                component.deselect();
+                this.components[key].selected = true;
 
             } else {
-                for (var i = 0; i < this.components.length; i++) {
-                    if (this.components[i] != component) {
-                        this.components[i].deselect();
+                if (this.components[key].selected) {
+                    this.components[key].selected = false;
 
-                    } else {
-                        this.components[i].select();
-                    }
+                } else {
+                    this.components[key].selected = true;
                 }
             }
         },
@@ -231,18 +259,14 @@ export default Vue.component('is-manager', {
         //
         //
 
-        sort: function(component) {
-            this.components.forEach(function(component) {
-                component.deselect();
-            });
+        sort: function(key) {
+            this.sorting = true;
 
-            if (!this.sorting) {
-                this.sorting = true;
-                component.select();
-
-            } else {
-                this.sorting = false;
+            for (var i = 0; i < this.components.length; i++) {
+                this.components[i].selected = false;
             }
+
+            this.components[key].selected = true;
         },
 
         //
@@ -280,22 +304,11 @@ export default Vue.component('is-manager', {
 
 
     watch: {
-        selected: function(newValue, oldValue) {
-            if (this.container) {
-                if (newValue > 0) {
-                    this.container.classList.add('is-has-selected');
-
-                } else {
-                    this.container.classList.remove('is-has-selected');
-                }
-            }
-        },
-
         container: function(newValue, oldValue) {
             if (oldValue) {
-                this.components.forEach(function(component) {
-                    component.deselect();
-                });
+                for (var i = 0; i < this.components.length; i++) {
+                    this.components[i].selected = false;
+                }
 
                 oldValue.classList.remove('is-focused');
             }
@@ -304,12 +317,11 @@ export default Vue.component('is-manager', {
 
             if (newValue) {
                 for (var i = 0; i < newValue.children.length; i++) {
-                    this.components.push(new IsletComponent({
-                        data: {
-                            node: newValue.children.item(i),
-                            manager: this
-                        }
-                    }));
+                    this.components.push({
+                        node: newValue.children.item(i),
+                        selected: false,
+                        manager: this
+                    });
                 }
 
                 newValue.classList.remove('is-highlighted');

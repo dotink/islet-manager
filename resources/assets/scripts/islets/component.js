@@ -1,13 +1,17 @@
 import Vue from 'vue';
+import template from './views/component.html';
 
 export default Vue.component('is-component', {
-    template: '<div></div>',
-    
+    template: template,
+
+    props: [
+        'node',
+        'manager',
+        'selected'
+    ],
+
     data: function() {
         return {
-            node: null,
-            manager: null,
-            selected: false,
             module: {
                 label: null,
                 description: null,
@@ -18,39 +22,34 @@ export default Vue.component('is-component', {
 
 
     methods: {
-        deselect: function() {
-            if (!this.selected) {
-                return;
-            }
-
-            this.selected = false;
-
-            this.node.classList.remove('is-selected');
-            this.manager.selected--;
+        focus: function() {
+            this.manager.focus(this.node);
         },
 
-        select: function() {
-            if (this.selected) {
-                return;
-            }
-
-            this.selected  = true;
-
-            this.node.classList.add('is-selected');
-            this.manager.selected++;
+        select: function(key, event) {
+            this.manager.select(key, event);
         },
 
-        toggleSelected: function() {
-            if (this.selected) {
-                this.deselect();
+        sort: function(key) {
+            this.manager.sort(key);
+        }
+    },
+
+    watch: {
+        selected: function(value) {
+            if (value) {
+                this.node.classList.add('is-selected');
             } else {
-                this.select();
+                this.node.classList.remove('is-selected');
             }
         }
     },
 
-
     computed: {
+        focusable: function() {
+            return this.manager.canFocus(this.node);
+        },
+
         label: function() {
             if (this.module.label) {
                 return this.module.label;

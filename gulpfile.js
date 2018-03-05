@@ -71,6 +71,11 @@ var filters = {
 								query: {
 									presets: ['es2015', 'stage-0']
 								}
+							},
+							{
+								test: /\.html$/,
+								loader: 'html-loader',
+								exclude: "/node_modules/"
 							}
 						]
 					},

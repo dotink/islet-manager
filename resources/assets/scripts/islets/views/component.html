@@ -1,0 +1,9 @@
+<li v-bind:class="{ selected: selected }" v-on:click="$emit('select', $event)" v-on:dblclick="$emit('focus')" v-on:dragstart="$emit('sort')">
+    <h1 v-if="focusable" title="Click to select or deselect.  Double click to manage its interior elements.">{{ label }} <span >↴</span></h1>
+    <h1 v-if="!focusable" title="Click to select or deselect this element for removal.">{{ label }}</h1>
+    <div class="preview">
+        <img class="thumb" :src="thumb" />
+        <span class="content">{{ summary }}</span>
+    </div>
+    <span class="handle">☰</span>
+</li>
