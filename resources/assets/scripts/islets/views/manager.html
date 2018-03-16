@@ -29,17 +29,17 @@
             <ol>
                 <is-component
                     v-for="(component, key) in components"
-                    v-bind="{node: component.node, manager: component.manager, selected: component.selected}"
+                    v-bind="{node: component.node, focusable: canFocus(component.node), selected: component.selected}"
                     v-bind:key="key"
                     v-on:sort="sort(key)"
-                    v-on:focus="focus(node)"
-                    v-on:select="select(key, $event)"
+                    v-on:focus="focus(component.node)"
+                    v-on:select="select(key)"
                 ></is-component>
             </ol>
         </div>
         <div v-bind:class="{ active: view == 'add' }" class="add">
             <ol>
-                <li v-for="module in modules" v-on:click="add(module, $event)">
+                <li v-for="(module, name) in modules" v-on:click="add(name)">
                     <h1>{{ module.label }}</h1>
                     <div class="preview">
                         <img class="thumb" :src="module.thumb" />

@@ -6,9 +6,14 @@ export default Vue.component('is-component', {
 
     props: [
         'node',
-        'manager',
-        'selected'
+        'selected',
+        'focusable'
     ],
+
+
+    mounted: function() {
+
+    },
 
     data: function() {
         return {
@@ -20,36 +25,7 @@ export default Vue.component('is-component', {
         };
     },
 
-
-    methods: {
-        focus: function() {
-            this.manager.focus(this.node);
-        },
-
-        select: function(key, event) {
-            this.manager.select(key, event);
-        },
-
-        sort: function(key) {
-            this.manager.sort(key);
-        }
-    },
-
-    watch: {
-        selected: function(value) {
-            if (value) {
-                this.node.classList.add('is-selected');
-            } else {
-                this.node.classList.remove('is-selected');
-            }
-        }
-    },
-
     computed: {
-        focusable: function() {
-            return this.manager.canFocus(this.node);
-        },
-
         label: function() {
             if (this.module.label) {
                 return this.module.label;

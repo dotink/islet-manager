@@ -1,6 +1,5 @@
 import Vue from 'vue';
 import IsletComponent from './component';
-import IsletModule from './module';
 import template from './views/manager.html';
 
 var Sortable = require('sortablejs/Sortable.js');
@@ -15,11 +14,11 @@ export default Vue.component('is-manager', {
             api: null,
             body: null,
             view: 'help',
-            handle: null,
             islets: [],
             sorting: false,
             container: null,
             components: [],
+            selected: 0,
             modules: {
                 'section': {
                     label: 'Section',
@@ -37,37 +36,27 @@ export default Vue.component('is-manager', {
         };
     },
 
-
-    computed: {
-        selected: function() {
-            var count = 0;
-
-            for (var i = 0; i < this.components.length; i++) {
-                if (this.components[i].selected) {
-                    count++;
-                }
-            }
-
-            return count;
-        }
-    },
-
     methods: {
 
         //
         //
         //
 
-        add: function(module, event) {
+        add: function(name) {
             var template       = document.createElement('template');
+            var module         = this.modules[name];
             template.innerHTML = module.content.trim();
 
-            for (var i = 0; i < template.content.children.length; i++) {
-                this.components.push({
-                    node: this.container.appendChild(template.content.children.item(i)),
-                    selected: false,
-                    manager: this
-                });
+            if (template.content.children.length != 1) {
+                console.error('Bad module template, must be a single element.');
+
+            } else {
+                var node = template.content.children.item(0);
+
+                node.dataset.module = name;
+
+                this.container.appendChild(node);
+                this.components.push({node: node});
             }
 
             this.show('list');
@@ -114,12 +103,33 @@ export default Vue.component('is-manager', {
         //
 
         focus: function(el) {
+            if (this.container) {
+                for (var i = 0; i < this.components.length; i++) {
+                    if (this.components[i].selected) {
+                        this.select(i);
+                    }
+                }
+
+                this.container.classList.remove('is-focused');
+            }
+
             while (el) {
                 if (this.canFocus(el)) {
                     break;
                 }
 
                 el = el.parentNode;
+            }
+
+            this.components = [];
+
+            if (el) {
+                for (var i = 0; i < el.children.length; i++) {
+                    this.components.push({node: el.children.item(i)});
+                }
+
+                el.classList.remove('is-highlighted');
+                el.classList.add('is-focused');
             }
 
             this.container = el;
@@ -209,6 +219,7 @@ export default Vue.component('is-manager', {
                 }
             }
 
+            this.selected   = 0;
             this.components = safe;
 
             while (this.canRemove(next)) {
@@ -229,21 +240,24 @@ export default Vue.component('is-manager', {
         //
         //
 
-        select: function(key, event) {
-            if (!event.ctrlKey && !event.metaKey) {
-                for (var i = 0; i < this.components.length; i++) {
-                    this.components[i].selected = false;
-                }
-
-                this.components[key].selected = true;
+        select: function(key) {
+            if (this.components[key].selected) {
+                this.components[key].selected = false;
+                console.log(this.components[key].node);
+                this.components[key].node.classList.remove('is-selected');
+                console.log(this.components[key].node);
+                this.selected--;
 
             } else {
-                if (this.components[key].selected) {
-                    this.components[key].selected = false;
+                this.components[key].selected = true;
+                this.components[key].node.classList.add('is-selected');
+                this.selected++;
+            }
 
-                } else {
-                    this.components[key].selected = true;
-                }
+            if (this.selected) {
+                this.container.classList.add('is-has-selected');
+            } else {
+                this.container.classList.remove('is-has-selected');
             }
         },
 
@@ -263,10 +277,12 @@ export default Vue.component('is-manager', {
             this.sorting = true;
 
             for (var i = 0; i < this.components.length; i++) {
-                this.components[i].selected = false;
+                if (this.components[i].selected) {
+                    this.select(i);
+                }
             }
 
-            this.components[key].selected = true;
+            this.select(key);
         },
 
         //
@@ -278,11 +294,9 @@ export default Vue.component('is-manager', {
                 return;
             }
 
-            this.on     = true;
-            this.handle = this.$el.ownerDocument.body.addEventListener('click', this.listener);
+            this.on = true;
 
-            this.$el.ownerDocument.body.classList.add('managing');
-
+            this.$el.ownerDocument.body.addEventListener('click', this.listener);
             this.focus(this.container);
         },
 
@@ -297,39 +311,9 @@ export default Vue.component('is-manager', {
 
             this.on = false;
 
-            this.$el.ownerDocument.body.classList.remove('managing');
             this.$el.ownerDocument.body.removeEventListener('click', this.listener);
         }
     },
-
-
-    watch: {
-        container: function(newValue, oldValue) {
-            if (oldValue) {
-                for (var i = 0; i < this.components.length; i++) {
-                    this.components[i].selected = false;
-                }
-
-                oldValue.classList.remove('is-focused');
-            }
-
-            this.components = [];
-
-            if (newValue) {
-                for (var i = 0; i < newValue.children.length; i++) {
-                    this.components.push({
-                        node: newValue.children.item(i),
-                        selected: false,
-                        manager: this
-                    });
-                }
-
-                newValue.classList.remove('is-highlighted');
-                newValue.classList.add('is-focused');
-            }
-        }
-    },
-
 
     mounted: function() {
         //
@@ -355,10 +339,6 @@ export default Vue.component('is-manager', {
             onEnd: this.move
         });
 
-        /*
-
-
-
-        */
+        this.api.getModules();
     }
 });

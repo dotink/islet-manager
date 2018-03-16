@@ -31,42 +31,20 @@
 
         &[data-name="start-managing"]::before {
             content: "\f0e8";
-
-            body.editing > &,
-            body.managing > & {
-                display: none;
-            }
         }
 
         &[data-name="start-editing"]::before {
             content: "\f303";
-
-            body.editing > &,
-            body.managing > & {
-                display: none;
-            }
         }
 
         &[data-name="save-editing"]::before {
-            display: none;
             background-color: rgb(26, 184, 0);
             content: "\f00c";
-
-            body.editing > &,
-            body.managing > & {
-                display: block;
-            }
         }
 
         &[data-name="exit-mode"]::before {
-            display: none;
             content: "\f053";
             background-color: rgb(61, 133, 255);
-
-            body.editing > &,
-            body.managing > & {
-                display: block;
-            }
         }
     }
 }
@@ -258,7 +236,7 @@ body.managing {
     .is-selected,
     .is-highlighted,
     .is-focused:not(.is-has-selected) {
-        background-color: rgba(200, 224, 200, .25) !important;
+        background-color: rgba(153, 189, 147, 0.25) !important;
     }
 }
 

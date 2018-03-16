@@ -1,0 +1,9 @@
+<ul id="actions">
+    <li
+        v-for="item in actions"
+        v-if="item.modes.includes(mode)"
+        v-on:click="click($event)"
+        :data-name="item.name"
+        :title="item.tooltip">
+    </li>
+</ul>
