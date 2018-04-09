@@ -7,22 +7,13 @@ export default Vue.component('is-component', {
     props: [
         'node',
         'selected',
-        'focusable'
+        'focusable',
+        'module'
     ],
 
 
     mounted: function() {
 
-    },
-
-    data: function() {
-        return {
-            module: {
-                label: null,
-                description: null,
-                thumb: null
-            }
-        };
     },
 
     computed: {

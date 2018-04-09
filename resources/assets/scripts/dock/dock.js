@@ -3,6 +3,7 @@ import template from './views/dock.html';
 
 export default Vue.component('dock', {
     template: template,
+
     data: function() {
         return {
             mode: null,

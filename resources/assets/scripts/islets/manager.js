@@ -19,20 +19,7 @@ export default Vue.component('is-manager', {
             container: null,
             components: [],
             selected: 0,
-            modules: {
-                'section': {
-                    label: 'Section',
-                    thumb: 'http://via.placeholder.com/128x72?text=</>',
-                    description: 'A section, nothing more.',
-                    content: '<section data-container data-module="section"></section>'
-                },
-                'paragraph': {
-                    label: 'Paragraph',
-                    thumb: 'http://via.placeholder.com/128x72?text=</>',
-                    description: 'A paragraph.',
-                    content: '<p data-module="paragraph">Lorem ipsum dolor sit ami...</p>'
-                }
-            }
+            modules: {}
         };
     },
 
@@ -103,6 +90,10 @@ export default Vue.component('is-manager', {
         //
 
         focus: function(el) {
+            if (Number.isInteger(el)) {
+                el = this.components[el].node;
+            }
+
             if (this.container) {
                 for (var i = 0; i < this.components.length; i++) {
                     if (this.components[i].selected) {
@@ -128,6 +119,20 @@ export default Vue.component('is-manager', {
                     this.components.push({node: el.children.item(i)});
                 }
 
+                if (this.getModule(el).allows) {
+                    for (var i in this.modules) {
+                        this.modules[i].disabled = true;
+
+                        if (this.modules[i].types) {
+                            for (var j = 0; j < this.modules[i].types.length; j++) {
+                                if (this.getModule(el).allows.includes(this.modules[i].types[j])) {
+                                    this.modules[i].disabled = false;
+                                }
+                            }
+                        }
+                    }
+                }
+
                 el.classList.remove('is-highlighted');
                 el.classList.add('is-focused');
             }
@@ -141,6 +146,21 @@ export default Vue.component('is-manager', {
                     this.show('list');
                 }
             });
+        },
+
+        //
+        //
+        //
+
+        getModule: function(node) {
+            if (node.dataset.module && this.modules[node.dataset.module]) {
+                return this.modules[node.dataset.module];
+            }
+
+            return {
+                allows: ["html"],
+                types:  ["html"]
+            };
         },
 
         //
@@ -243,9 +263,7 @@ export default Vue.component('is-manager', {
         select: function(key) {
             if (this.components[key].selected) {
                 this.components[key].selected = false;
-                console.log(this.components[key].node);
                 this.components[key].node.classList.remove('is-selected');
-                console.log(this.components[key].node);
                 this.selected--;
 
             } else {
@@ -316,6 +334,9 @@ export default Vue.component('is-manager', {
     },
 
     mounted: function() {
+
+        var self = this;
+
         //
         // Don't let our own events bubble up to the event handler.
         //
@@ -339,6 +360,8 @@ export default Vue.component('is-manager', {
             onEnd: this.move
         });
 
-        this.api.getModules();
+        this.api.getModules().then(function(modules) {
+            self.modules = modules;
+        });
     }
 });
